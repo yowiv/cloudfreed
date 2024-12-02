@@ -283,7 +283,7 @@ class CloudFreed {
               }
 
               if (PID) {
-                KillProcess(PID);
+                await KillProcess(PID);
               }
 
               return {
