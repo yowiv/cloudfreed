@@ -17,7 +17,8 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const EXTENSION_PATH = path.join(__dirname, "lib", "Extension");
-const chromium = GetDefaultChromePath();
+const chromePaths = GetDefaultChromePath();
+let chromium = null;
 const homedir = GetHomeDirectory();
 
 class CloudFreed {
@@ -31,7 +32,7 @@ class CloudFreed {
 
     try {
       // Check if OS is valid
-      if (!chromium && !homedir) {
+      if (!chromePaths || !homedir) {
         return {
           success: false,
           code: 500,
@@ -39,14 +40,22 @@ class CloudFreed {
         };
       }
 
-      // Check if Chrome is installed or uninstalled/misplaced
-      try {
-        await fs.access(chromium);
-      } catch (error) {
+      // Check if Chrome/Edge is installed
+      for (const path of chromePaths) {
+        try {
+          await fs.access(path);
+          chromium = path;
+          break;
+        } catch (error) {
+          continue;
+        }
+      }
+
+      if (!chromium) {
         return {
           success: false,
           code: 500,
-          errormessage: `Google Chrome is not installed on host server, please install Google Chrome and try again.\nAttempted path: ${chromium}`
+          errormessage: "Neither Google Chrome nor Microsoft Edge is installed on host server, please install one of them and try again."
         };
       }
 

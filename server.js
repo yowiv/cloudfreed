@@ -6,7 +6,7 @@ const app = express();
 app.use(express.json());
 
 // Constants
-const CLIENT_KEY = process.env.CLIENT_KEY;
+const CLIENT_KEY = process.env.CLIENT_KEY || '123';
 if (!CLIENT_KEY) {
     console.error('Error: CLIENT_KEY environment variable is not set');
     process.exit(1);
