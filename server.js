@@ -16,7 +16,8 @@ const SUPPORTED_TYPES = {
     "Turnstile": "Turnstile",
     "CloudflareChallenge": "V3",
     "TurnstileInvisible": "Invisible",
-    "CloudflareIUAM": "IUAM"
+    "CloudflareIUAM": "IUAM",
+    "RecaptchaInvisible": "RecaptchaInvisible",
 };
 const MAX_CONCURRENT_TASKS = parseInt(process.env.MAX_CONCURRENT_TASKS, 10) || 1;
 
