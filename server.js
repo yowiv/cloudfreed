@@ -6,14 +6,19 @@ const app = express();
 app.use(express.json());
 
 // Constants
-const CLIENT_KEY = "your_predefined_client_key";
+const CLIENT_KEY = process.env.CLIENT_KEY;
+if (!CLIENT_KEY) {
+    console.error('Error: CLIENT_KEY environment variable is not set');
+    process.exit(1);
+}
+
 const SUPPORTED_TYPES = {
     "Turnstile": "Turnstile",
     "CloudflareChallenge": "V3",
     "TurnstileInvisible": "Invisible",
     "CloudflareIUAM": "IUAM"
 };
-const MAX_CONCURRENT_TASKS = 1;
+const MAX_CONCURRENT_TASKS = parseInt(process.env.MAX_CONCURRENT_TASKS, 10) || 1;
 
 // Initialize CloudFreed instances pool
 const instancePool = [];
