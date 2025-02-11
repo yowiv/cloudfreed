@@ -2,7 +2,7 @@ import express from 'express';
 import CloudFreed from "./index.js";
 import Queue from 'better-queue';
 import { exec } from 'child_process';
-import { createProxyMiddleware } from 'http-proxy-middleware';
+import proxy from 'express-http-proxy';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -40,10 +40,12 @@ const app = express();
 app.use(express.json());
 
 // Add proxy middleware for /wssocks
-app.use('/wssocks', createProxyMiddleware({
-    target: `http://localhost:${WSSOCKS_PORT}`,
-    ws: true, // Enable WebSocket proxy
-    changeOrigin: true
+app.use('/wssocks', proxy(`http://localhost:${WSSOCKS_PORT}`, {
+    ws: true,
+    proxyReqOptDecorator: function(proxyReqOpts) {
+        proxyReqOpts.headers['origin'] = `http://localhost:${WSSOCKS_PORT}`;
+        return proxyReqOpts;
+    }
 }));
 
 const SUPPORTED_TYPES = {
