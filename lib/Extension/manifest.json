@@ -1,39 +1,19 @@
 {
   "manifest_version": 3,
-  "name": "CloudFreed",
-  "version": "1.0.1",
   "permissions": [
-    "proxy",
-    "declarativeNetRequest"
+      "debugger"
   ],
+  "name": "Turnstile Patcher",
+  "version": "1",
   "background": {
-    "service_worker": "background.js"
+      "service_worker": "background.js",
+      "type": "module"
   },
-  "host_permissions": [
-    "<all_urls>"
-  ],
   "content_scripts": [
-    {
-      "js": [
-        "./script.js"
-      ],
-      "matches": [
-        "<all_urls>"
-      ],
-      "run_at": "document_start",
-      "all_frames": true,
-      "world": "MAIN"
-    },
-    {
-      "js": [
-        "./click.js"
-      ],
-      "matches": [
-        "*://challenges.cloudflare.com/*"
-      ],
-      "run_at": "document_start",
-      "all_frames": true,
-      "world": "MAIN"
-    }
+      {
+          "js": ["script.js"],
+          "matches": ["<all_urls>"],
+          "run_at": "document_start"
+      }
   ]
 }
