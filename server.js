@@ -1,8 +1,6 @@
 import express from 'express';
 import CloudFreed from "./index.js";
 import Queue from 'better-queue';
-import { exec } from 'child_process';
-import proxy from 'express-http-proxy';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -16,37 +14,8 @@ if (!CLIENT_KEY) {
     process.exit(1);
 }
 
-const WSSOCKS_PORT = 8765;
-
-// Start wssocks server
-const startWssocks = () => {
-    const wssocksPath = path.join(__dirname, 'wssocks');
-    const wssocksProcess = exec(`"${wssocksPath}" server -k ${CLIENT_KEY} -p ${WSSOCKS_PORT}`, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Error starting wssocks server: ${error}`);
-            return;
-        }
-        console.log(`wssocks server output: ${stdout}`);
-    });
-
-    wssocksProcess.on('exit', (code) => {
-        console.log(`wssocks server exited with code ${code}`);
-    });
-
-    return wssocksProcess;
-};
-
 const app = express();
 app.use(express.json());
-
-// Add proxy middleware for /wssocks
-app.use('/wssocks', proxy(`http://localhost:${WSSOCKS_PORT}`, {
-    ws: true,
-    proxyReqOptDecorator: function(proxyReqOpts) {
-        proxyReqOpts.headers['origin'] = `http://localhost:${WSSOCKS_PORT}`;
-        return proxyReqOpts;
-    }
-}));
 
 const SUPPORTED_TYPES = {
     "Turnstile": "Turnstile",
@@ -162,13 +131,8 @@ app.listen(PORT, HOST, () => {
 const shutdown = async () => {
     console.log('Shutting down gracefully...');
     await Promise.all(instances.map(instance => instance.Close()));
-    if (wssocksProcess) {
-        wssocksProcess.kill();
-    }
     process.exit(0);
 };
-
-const wssocksProcess = startWssocks();
 
 process.on('SIGTERM', shutdown);
 process.on('SIGINT', shutdown);
