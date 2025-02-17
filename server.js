@@ -15,7 +15,19 @@ if (!CLIENT_KEY) {
 }
 
 const app = express();
-app.use(express.json());
+app.use(express.json({
+    limit: '1mb',
+    verify: (req, res, buf, encoding) => {
+        req.rawBody = buf;
+    }
+}));
+
+app.use((err, req, res, next) => {
+    if (err.type === 'request.aborted') {
+        return;
+    }
+    next(err);
+});
 
 const SUPPORTED_TYPES = {
     "Turnstile": "Turnstile",
@@ -40,7 +52,7 @@ const taskQueue = new Queue(async (task, cb) => {
     try {
         const instance = instances[currentInstanceIndex];
         currentInstanceIndex = (currentInstanceIndex + 1) % instances.length;
-
+        
         const result = await instance.Solve({
             type: task.mappedType,
             url: task.url,
@@ -52,8 +64,12 @@ const taskQueue = new Queue(async (task, cb) => {
         cb(null, result);
     } catch (error) {
         console.error(`Task ${task.taskId} failed: ${error.message}`);
-        taskResults.set(task.taskId, { status: 'failed', error: error.message });
-        cb(error);
+        taskResults.set(task.taskId, { 
+            status: 'failed', 
+            error: error.message,
+            timestamp: Date.now()
+        });
+        cb(null);
     }
 }, { concurrent: MAX_CONCURRENT_TASKS });
 
