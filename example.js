@@ -26,14 +26,20 @@ const instance = await CF.start(false, true)
 
 console.log(instance)
 
-
 console.log(await instance.Solve({
   type: "V3",
   url: "www.subber.xyz",
-  proxy: { scheme: "socks5", host: "127.0.0.1", port: 1080 },
+  proxy: { scheme: "http", host: "127.0.0.1", port: 8080 },
 }))
 
 await delay(3723498) // optional, stop (kinda) after testing V3.
+
+console.log(await instance.Solve({
+  type: "Turnstile",
+  url: "https://web.nebula-media.org",
+  sitekey: "0x4AAAAAAADGwT_-TpuCDrw9",
+  proxy: { scheme: "socks5", host: "127.0.0.1", port: 1080 },
+}))
 
 console.log(await instance.Solve({
   type: "RecaptchaInvisible",

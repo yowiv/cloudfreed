@@ -53,15 +53,43 @@ const taskQueue = new Queue(async (task, cb) => {
         const instance = instances[currentInstanceIndex];
         currentInstanceIndex = (currentInstanceIndex + 1) % instances.length;
         
-        const result = await instance.Solve({
-            type: task.mappedType,
-            url: task.url,
-            sitekey: task.sitekey,
-            action: task.action,
-            proxy: task.proxy
+        // Add timeout to prevent infinite hanging
+        const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Task timeout after 90 seconds')), 90000);
         });
-        taskResults.set(task.taskId, { status: 'completed', result });
-        cb(null, result);
+        
+        try {
+            const result = await Promise.race([
+                instance.Solve({
+                    type: task.mappedType,
+                    url: task.url,
+                    sitekey: task.sitekey,
+                    action: task.action,
+                    proxy: task.proxy
+                }),
+                timeoutPromise
+            ]);
+            
+            taskResults.set(task.taskId, { status: 'completed', result });
+            cb(null, result);
+        } catch (error) {
+            // If it's a timeout error, close and replace the instance
+            if (error.message.includes('Task timeout')) {
+                console.log('Task timeout, replacing instance...');
+                // Try to close the instance within 10 seconds
+                const closePromise = Promise.race([
+                    instance.Close(),
+                    new Promise(resolve => setTimeout(resolve, 10000))
+                ]);
+                await closePromise;
+                
+                // Create and replace with a new instance
+                const newInstance = new CloudFreed();
+                const startedInstance = await newInstance.start(false, true);
+                instances[currentInstanceIndex] = startedInstance;
+            }
+            throw error;
+        }
     } catch (error) {
         console.error(`Task ${task.taskId} failed: ${error.message}`);
         taskResults.set(task.taskId, { 
@@ -69,9 +97,14 @@ const taskQueue = new Queue(async (task, cb) => {
             error: error.message,
             timestamp: Date.now()
         });
-        cb(null);
+        cb(error);
     }
-}, { concurrent: MAX_CONCURRENT_TASKS });
+}, { 
+    concurrent: MAX_CONCURRENT_TASKS,
+    maxRetries: 2, // Add retry limit
+    retryDelay: 1000, // Retry after 1 second
+    timeout: 65000 // Queue-level timeout slightly higher than task timeout
+});
 
 const validateClientKey = (req, res, next) => {
     const { clientKey } = req.body;
