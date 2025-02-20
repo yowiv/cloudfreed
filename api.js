@@ -44,9 +44,9 @@ const argv = yargs(hideBin(process.argv))
 const config = {
     clientKey: argv.clientKey || process.env.CLOUDFREED_CLIENT_KEY,
     maxConcurrentTasks: argv.workers || parseInt(process.env.CLOUDFREED_WORKERS, 10) || 1,
-    port: argv.port || process.env.CLOUDFREED_PORT || 3000,
+    port: argv.port || parseInt(process.env.CLOUDFREED_PORT, 10) || 3000,
     host: argv.host || process.env.CLOUDFREED_HOST || "localhost",
-    timeout: argv.timeout || process.env.CLOUDFREED_TASK_TIMEOUT || 60,
+    timeout: argv.timeout || parseInt(process.env.CLOUDFREED_TASK_TIMEOUT, 10) || 60,
     logError: argv.logError || false,
 };
 

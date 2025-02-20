@@ -77,6 +77,7 @@ try {
           type: "CloudflareChallenge",
           url: "https://vip.charontv.com/challenge?id=12345678",
           proxy: { scheme: "http", host: "127.0.0.1", port: 1080, username: "user", password: "pass" },
+          timeout: 5,
         })
       );
     },
