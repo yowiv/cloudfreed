@@ -4,7 +4,7 @@ import Server from './lib/Server.js';
 
 const argv = yargs(hideBin(process.argv))
   .locale('en')
-  .option('client-key', {
+  .option('clientKey', {
     alias: 'k',
     type: 'string',
     description: 'Client API key'
@@ -33,7 +33,7 @@ const argv = yargs(hideBin(process.argv))
     description: 'Timeout per task in seconds',
     default: 60
   })
-  .option('log-error', {
+  .option('logError', {
     alias: 'l',
     type: 'boolean',
     description: 'Enable error logging',
@@ -43,7 +43,7 @@ const argv = yargs(hideBin(process.argv))
 
 const config = {
     clientKey: argv.clientKey || process.env.CLOUDFREED_CLIENT_KEY,
-    maxConcurrentTasks: argv.maxTasks || parseInt(process.env.CLOUDFREED_WORKERS, 10) || 1,
+    maxConcurrentTasks: argv.workers || parseInt(process.env.CLOUDFREED_WORKERS, 10) || 1,
     port: argv.port || process.env.CLOUDFREED_PORT || 3000,
     host: argv.host || process.env.CLOUDFREED_HOST || "localhost",
     timeout: argv.timeout || process.env.CLOUDFREED_TASK_TIMEOUT || 60,
