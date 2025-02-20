@@ -216,23 +216,23 @@ class CloudFreed {
                         const interval = setInterval(async () => {
                           elapsed += 1;
                       
-                          // Check if the solving flag is false or if we've reached 120 seconds (120 iterations)
-                          if (solving === false || elapsed >= 120) {
-                            clearInterval(interval); // Stop the interval after 120 seconds or if solving is false
+                          // Check if the solving flag is false or if we've reached 60 seconds (60 iterations)
+                          if (solving === false || elapsed >= 60) {
+                            clearInterval(interval); // Stop the interval after 60 seconds or if solving is false
                       
                             if (solving === true) {
                               try {
-                                // Navigate the page if solving is still true after 120 seconds
+                                // Navigate the page if solving is still true after 60 seconds
                                 await client.Page.navigate({ url: `file:///${path.join(__dirname, "html", "CloudFreed.html")}` }, sessionId);
                       
                                 solving = false;
                       
-                                resolve({ success: false, code: 408, errormessage: "Request timed out after 120 seconds." });
+                                resolve({ success: false, code: 408, errormessage: "Request timed out after 60 seconds." });
                               } catch (error) {
-                                resolve({ success: false, code: 408, errormessage: "Request timed out with an error after 120 seconds." });
+                                resolve({ success: false, code: 408, errormessage: "Request timed out with an error after 60 seconds." });
                               }
                             } else {
-                              return; // Resolve immediately if solving became false before 120 seconds
+                              return; // Resolve immediately if solving became false before 60 seconds
                             }
                           }
                         }, 1000); // Run every 1 second
