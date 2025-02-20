@@ -4,12 +4,12 @@ import Server from './lib/Server.js';
 
 const argv = yargs(hideBin(process.argv))
   .locale('en')
-  .option('clientKey', {
+  .option('client-key', {
     alias: 'k',
     type: 'string',
     description: 'Client API key'
   })
-  .option('maxTasks', {
+  .option('workers', {
     alias: 'm',
     type: 'number',
     description: 'Maximum concurrent tasks',
@@ -33,14 +33,21 @@ const argv = yargs(hideBin(process.argv))
     description: 'Timeout per task in seconds',
     default: 60
   })
+  .option('log-error', {
+    alias: 'l',
+    type: 'boolean',
+    description: 'Enable error logging',
+    default: false
+  })
   .argv;
 
 const config = {
-    clientKey: argv.clientKey || process.env.CLIENT_KEY,
-    maxConcurrentTasks: argv.maxTasks || parseInt(process.env.MAX_CONCURRENT_TASKS, 10) || 1,
-    port: argv.port || process.env.PORT || 3000,
-    host: argv.host || process.env.HOST || "localhost",
-    timeout: argv.timeout || 60,
+    clientKey: argv.clientKey || process.env.CLOUDFREED_CLIENT_KEY,
+    maxConcurrentTasks: argv.maxTasks || parseInt(process.env.CLOUDFREED_WORKERS, 10) || 1,
+    port: argv.port || process.env.CLOUDFREED_PORT || 3000,
+    host: argv.host || process.env.CLOUDFREED_HOST || "localhost",
+    timeout: argv.timeout || process.env.CLOUDFREED_TASK_TIMEOUT || 60,
+    logError: argv.logError || false,
 };
 
 const server = new Server(config);
