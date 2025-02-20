@@ -1,106 +1,98 @@
 import CloudFreed from "./lib/CloudFreed.js";
-import delay from "./lib/delay.js";
-
-/* 
-documentation for instance.Solve data.
-
-(property) Solve?: ((data: {
-  url: string;
-  type: string;
-  sitekey: string | undefined;
-  userAgent: string | undefined;
-  action: string | undefined;
-  proxy: {
-      scheme: string;
-      host: string;
-      port: number;
-      username: string | undefined;
-      password: string | undefined;
-  };
-}) => Promise<...>) | undefined
-*/
 
 const CF = new CloudFreed();
-
 const instance = await CF.start(false, true);
 
-console.log(instance);
+const args = process.argv.slice(2);
+const testsToRun = args.length > 0 ? args : ['recaptcha-invisible', 'cloudflare-invisible', 'cf-challenge-iuam', 'cf-challenge', 'turnstile'];
 
-console.log(
-  await instance.Solve({
-    type: "V3",
-    url: "https://vip.charontv.com/challenge?id=123456",
-    proxy: { scheme: "http", host: "127.0.0.1", port: 8080 },
-  }),
-);
+try {
+  const tests = {
+    'recaptcha-invisible': async () => {
+      console.log(
+        await instance.Solve({
+          type: "RecaptchaInvisible",
+          url: "https://antcpt.com/score_detector/",
+          sitekey: "6LcR_okUAAAAAPYrPe-HK_0RULO1aZM15ENyM-Mf",
+          action: "homepage",
+          userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36",
+        })
+      );
+    },
+    
+    'cloudflare-invisible': async () => {
+      console.log(
+        await instance.Solve({
+          type: "CloudflareInvisible",
+          url: "discord.com",
+          userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36",
+        })
+      );
+    },
+    
+    'cf-challenge-iuam': async () => {
+      console.log(
+        await instance.Solve({
+          type: "CloudflareChallenge",
+          url: "bloxmoon.com",
+          userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36",
+          // proxy: { scheme: "socks5", host: "127.0.0.1", port: 1080 },
+        })
+      );
+    },
+    
+    'cf-challenge': async () => {
+      console.log(
+        await instance.Solve({
+          type: "CloudflareChallenge",
+          url: "www.subber.xyz",
+          // proxy: { scheme: "socks5", host: "127.0.0.1", port: 1080 },
+        })
+      );
+    },
+    
+    'turnstile': async () => {
+      console.log(
+        await instance.Solve({
+          type: "Turnstile",
+          url: "www.coronausa.com",
+          sitekey: "0x4AAAAAAAH4-VmiV_O_wBN-",
+        })
+      );
+    },
 
-await delay(3723498); // optional, stop (kinda) after testing V3.
+    'nebula': async () => {
+      console.log(
+        await instance.Solve({
+          type: "Turnstile",
+          url: "https://web.nebula-media.org/",
+          sitekey: "0x4AAAAAAADGwT_-TpuCDrw9",
+        })
+      );
+    },
 
-console.log(
-  await instance.Solve({
-    type: "Turnstile",
-    url: "https://web.nebula-media.org",
-    sitekey: "0x4AAAAAAADGwT_-TpuCDrw9",
-    proxy: { scheme: "socks5", host: "127.0.0.1", port: 1080 },
-  }),
-);
+    'charon': async () => {
+      console.log(
+        await instance.Solve({
+          type: "CloudflareChallenge",
+          url: "https://vip.charontv.com/challenge?id=12345678",
+          proxy: { scheme: "https", host: "127.0.0.1", port: 8080 },
+        })
+      );
+    },
+  };
 
-console.log(
-  await instance.Solve({
-    type: "RecaptchaInvisible",
-    url: "https://antcpt.com/score_detector/",
-    sitekey: "6LcR_okUAAAAAPYrPe-HK_0RULO1aZM15ENyM-Mf",
-    action: "homepage",
-    //proxy: { scheme: "http", host: "152.26.229.42", port: 9443 },
-    userAgent:
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36",
-  }),
-);
+  for (const test of testsToRun) {
+    if (tests[test]) {
+      console.log(`Running test: ${test}`);
+      await tests[test]();
+    } else {
+      console.warn(`Unknown test: ${test}`);
+    }
+  }
 
-console.log(
-  await instance.Solve({
-    type: "Invisible",
-    url: "discord.com",
-    //proxy: { scheme: "http", host: "152.26.229.42", port: 9443 },
-    userAgent:
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36",
-  }),
-);
-
-console.log(
-  await instance.Solve({
-    type: "IUAM",
-    url: "bloxmoon.com",
-    //proxy: { scheme: "http", host: "152.26.229.42", port: 9443 },
-    userAgent:
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36",
-  }),
-);
-
-console.log(
-  await instance.Solve({
-    type: "V3",
-    url: "www.subber.xyz",
-    proxy: { scheme: "socks5", host: "127.0.0.1", port: 1080 },
-  }),
-);
-
-console.log(
-  await instance.Solve({
-    type: "Turnstile",
-    url: "www.coronausa.com",
-    sitekey: "0x4AAAAAAAH4-VmiV_O_wBN-",
-    proxy: { scheme: "socks5", host: "127.0.0.1", port: 1080 },
-  }),
-);
-
-console.log(
-  await instance.Solve({
-    type: "Turnstile",
-    url: "https://web.nebula-media.org",
-    sitekey: "0x4AAAAAAADGwT_-TpuCDrw9",
-    proxy: { scheme: "socks5", host: "127.0.0.1", port: 1080 },
-  }),
-);
-
-await instance.Close();
+} catch (error) {
+  console.error('Error occurred:', error);
+} finally {
+  await instance.Close();
+}

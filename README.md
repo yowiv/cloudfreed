@@ -1,26 +1,6 @@
-## STATUS: Active
-
-Updates are on the way!
-V4 Just released, please report any errors in Issues.
-
-## Discord Server
-
-[![Discord](https://img.shields.io/discord/1219437599740002445.svg?label=Discord&logo=discord&colorB=7289DA)](https://discord.gg/5ncqYYQTPN)
-
-## Notice
-
-If you like the repo, please consider starring it, starring repos will help it spread.
-CloudFreed is 100% Free, CloudFreed can stop working at any time.
-Files may have problems loading correctly, this is because of the request interception. This may be fixed in the future!
-
-## Introduction
-
 <div style="text-align:center;">
   <img src="html/CloudFreed.png" alt="CloudFreed Logo" width="48" style="float:left; margin-right:10px;">
   <h1>CloudFreed V4</h1>
-
-[Join the CloudFreed Server](https://discord.gg/8F852cXVbX)
-
 </div>
 
 CloudFreed is a powerful tool designed to bypass Cloudflare anti-bot protection, allowing users to access websites without being restricted by captchas or Cloudflare's security measures.
@@ -48,26 +28,96 @@ Once Node.js is installed, follow these steps to set up CloudFreed:
 
 ## Usage
 
-After installing dependencies, you can start using CloudFreed. The main functionality is provided through the `CloudFreed` function, which returns the `cf_clearence` cookie necessary for bypassing Cloudflare protection.
+CloudFreed can be used either through command line examples or via its API interface.
 
-To use CloudFreed in your project, look at example.js
+### Command Line Usage
 
-### Example:
+After installing dependencies, you can run the example scripts:
 
-Find example in example.js
+```bash
+node example.js cf-challenge
+```
 
-## Contribution
+Available examples:
 
-Suggestions and pull requests are welcomed!.
+- cf-challenge
+- cf-challenge-iuam (I am under attack mode)
+- turnstile
+- cloudflare-invisible
+- recaptcha-invisible
 
-## Support the project
+### API Usage
 
-Supporting the project will most likely contribute to the creation of newer versions, and maybe even newer projects!
-Please consider donating if you like the project.
+You can also run CloudFreed as an API server:
 
-[Support me at ko-fi.com](https://ko-fi.com/akmal2)
+1. Start the API server:
 
----
+```bash
+node api.js -k YOUR_CLIENT_KEY
+```
+
+Available options:
+- `-k, --clientKey`: Client API key (required)
+- `-m, --maxTasks`: Maximum concurrent tasks (default: 1)
+- `-p, --port`: Server port to listen (default: 3000)
+- `-h, --host`: Server host to listen (default: localhost)
+- `-t, --timeout`: Timeout per task in seconds (default: 60)
+
+2. Create a new task:
+
+```
+POST http://localhost:3000/createTask
+
+{
+  "clientKey": "YOUR_CLIENT_KEY",
+  "type": "CloudflareChallenge",
+  "url": "www.example.com",
+  "userAgent": "YOUR_USER_AGENT",
+  "proxy": {
+    "scheme": "socks5",
+    "host": "127.0.0.1",
+    "port": 1080
+  }
+}
+```
+
+Response Example:
+
+```
+{
+    "taskId": "m7dobozwh6gucqy29dk"
+}
+```
+
+3. Get task results:
+
+```
+POST http://localhost:3000/getTaskResult
+
+{
+  "clientKey": "YOUR_CLIENT_KEY",
+  "taskId": "YOUR_TASK_ID"
+}
+```
+
+Response Example:
+
+```
+{
+  "status": "completed",
+  "result": {
+    "success": true,
+    "code": 200,
+    "response": "<cf_clearance_or_token>",
+    "data": {
+      "type": "CloudflareChallenge",
+      "url": "www.example.com",
+      "timeout": 60,
+      "userAgent": "YOUR_USER_AGENT"
+    }
+  }
+}
+```
 
 ## Note
 
