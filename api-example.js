@@ -116,8 +116,11 @@ async function solveTurnstile(clientKey, url, siteKey, action = null, proxyConfi
     console.debug("Call new captcha task:", createTaskData);
 
     const isHttps = url.startsWith('https');
-    const proxy = proxyConfig ? new Proxy({ 
-        [isHttps ? 'https' : 'http']: `${proxyConfig.scheme}://${proxyConfig.host}:${proxyConfig.port}` 
+    const proxy = proxyConfig ? new Proxy({
+        [proxyConfig.scheme === 'socks5' ? 'socks' : (isHttps ? 'https' : 'http')]: 
+            proxyConfig.scheme === 'socks5' 
+                ? `socks5://${proxyConfig.host}:${proxyConfig.port}`
+                : `${proxyConfig.scheme}://${proxyConfig.host}:${proxyConfig.port}`
     }) : null;
     const options = {
         method: 'POST',
@@ -147,13 +150,13 @@ async function solveTurnstile(clientKey, url, siteKey, action = null, proxyConfi
         const data = checkResponse.data;
 
         if (data.status === "failed") {
-            throw new Error(`Task failed: ${data.error || 'Unknown error occurs.'}`);
+            throw new Error(`Task failed: ${data.errormessage || 'Unknown error occurs.'}`);
         }
 
         if (data.status === "completed") {
             const result = data.result;
             if (!result.success) {
-                throw new Error(`Task failed: ${result.error || 'Unknown error occurs.'}`);
+                throw new Error(`Task failed: ${result.errormessage || 'Unknown error occurs.'}`);
             }
             return result.response;
         }
@@ -227,8 +230,11 @@ async function getContent(url, proxyConfig = null, cfClearance = null, userAgent
     };
 
     const isHttps = url.startsWith('https');
-    const proxy = proxyConfig ? new Proxy({ 
-        [isHttps ? 'https' : 'http']: `${proxyConfig.scheme}://${proxyConfig.host}:${proxyConfig.port}` 
+    const proxy = proxyConfig ? new Proxy({
+        [proxyConfig.scheme === 'socks5' ? 'socks' : (isHttps ? 'https' : 'http')]: 
+            proxyConfig.scheme === 'socks5' 
+                ? `socks5://${proxyConfig.host}:${proxyConfig.port}`
+                : `${proxyConfig.scheme}://${proxyConfig.host}:${proxyConfig.port}`
     }) : null;
     
     const options = {
