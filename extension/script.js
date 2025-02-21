@@ -28,3 +28,6 @@ function handleMessage(event) {
 }
 
 window.addEventListener("message", handleMessage);
+
+// FOR TESTING
+// window.onbeforeunload = function(){ return 'Leave page?'; };
