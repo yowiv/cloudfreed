@@ -67,6 +67,7 @@ try {
           type: "Turnstile",
           url: "https://web.nebula-media.org/",
           sitekey: "0x4AAAAAAADGwT_-TpuCDrw9",
+          timeout: 5,
         })
       );
     },
@@ -75,9 +76,9 @@ try {
       console.log(
         await instance.Solve({
           type: "CloudflareChallenge",
-          url: "https://vip.charontv.com/challenge?id=12345678",
-          proxy: { scheme: "http", host: "127.0.0.1", port: 1080, username: "user", password: "pass" },
-          timeout: 5,
+          url: "https://vip.charontv.com/challenge?id=5fd1d317401453312092009644",
+          proxy: { scheme: "http", host: "127.0.0.1", port: 1080 },
+          content: true,
         })
       );
     },

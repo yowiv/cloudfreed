@@ -1,6 +1,6 @@
-import http from 'http';
-import https from 'https';
 import Proxy from './lib/Proxy.js';
+import getContent from './lib/getContent.js';
+import makeRequest from './lib/makeRequest.js';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
@@ -48,60 +48,6 @@ const proxyConfig = argv['proxy-host'] && argv['proxy-port'] ? {
     port: argv['proxy-port']
 } : null;
 
-function makeRequest(url, options, data = null) {
-    return new Promise((resolve, reject) => {
-        const isHttps = url.startsWith('https');
-        const client = isHttps ? https : http;
-        
-        console.log(`Accessing ${options.method} ${url}`);
-
-        const req = client.request(url, options, (res) => {
-            let responseData = '';
-
-            if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-                console.log(res.headers)
-                console.log(`Redirecting to ${res.headers.location}`);
-
-                // Create new options object for redirect request
-                const redirectOptions = { ...options };
-                const redirectUrl = new URL(res.headers.location, url).href;
-                
-                // Follow the redirect with the same method and headers
-                return makeRequest(redirectUrl, redirectOptions, data)
-                    .then(resolve)
-                    .catch(reject);
-            }
-
-            res.on('data', (chunk) => {
-                responseData += chunk;
-            });
-            
-            res.on('end', () => {
-                if (res.statusCode >= 200 && res.statusCode < 400) {
-                    try {
-                        const jsonData = JSON.parse(responseData);
-                        resolve({ ok: true, data: jsonData, text: responseData });
-                    } catch (e) {
-                        resolve({ ok: true, text: responseData });
-                    }
-                } else {
-                    reject(new Error(`HTTP Error: ${res.statusCode} ${responseData}`));
-                }
-            });
-        });
-
-        req.on('error', (error) => {
-            reject(error);
-        });
-
-        if (data) {
-            req.write(JSON.stringify(data));
-        }
-        
-        req.end();
-    });
-}
-
 async function solveTurnstile(clientKey, url, siteKey, action = null, proxyConfig = null) {
     const createTaskData = {
         clientKey: clientKey,
@@ -127,10 +73,12 @@ async function solveTurnstile(clientKey, url, siteKey, action = null, proxyConfi
         headers: {
             'Content-Type': 'application/json',
         },
-        agent: proxy?.getAgent()
+        agent: proxy?.getAgent(),
+        api: true,
     };
 
     const response = await makeRequest(`${API_URL}/createTask`, options, createTaskData);
+
     const taskData = response.data;
     const taskId = taskData.taskId;
 
@@ -184,6 +132,7 @@ async function solveChallenge(clientKey, url, proxyConfig = null) {
         headers: {
             'Content-Type': 'application/json',
         },
+        api: true,
     };
 
     const response = await makeRequest(`${API_URL}/createTask`, options, createTaskData);
@@ -221,36 +170,6 @@ async function solveChallenge(clientKey, url, proxyConfig = null) {
     }
 
     throw new Error("timeout to get result");
-}
-
-async function getContent(url, proxyConfig = null, cfClearance = null, userAgent = null) {
-    const headers = {
-        ...(userAgent && { 'User-Agent': userAgent }),
-        ...(cfClearance && { 'Cookie': `cf_clearance=${cfClearance}` })
-    };
-
-    const isHttps = url.startsWith('https');
-    const proxy = proxyConfig ? new Proxy({
-        [proxyConfig.scheme === 'socks5' ? 'socks' : (isHttps ? 'https' : 'http')]: 
-            proxyConfig.scheme === 'socks5' 
-                ? `socks5://${proxyConfig.host}:${proxyConfig.port}`
-                : `${proxyConfig.scheme}://${proxyConfig.host}:${proxyConfig.port}`
-    }) : null;
-    
-    const options = {
-        method: 'GET',
-        headers,
-        agent: proxy?.getAgent(),
-        timeout: 30000
-    };
-
-    const response = await makeRequest(url, options);
-    const content = response.text;
-
-    if (content.includes("cf-wrapper") || content.includes("Enable JavaScript and cookies to continue")) {
-        return null;
-    }
-    return content;
 }
 
 async function main() {
