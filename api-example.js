@@ -121,6 +121,7 @@ async function solveChallenge(clientKey, url, proxyConfig = null) {
         type: "CloudflareChallenge",
         url: url,
         proxy: proxyConfig,
+        content: true,
     };
 
     if (proxyConfig) createTaskData.proxy = proxyConfig;
@@ -153,6 +154,8 @@ async function solveChallenge(clientKey, url, proxyConfig = null) {
         );
 
         const data = checkResponse.data;
+
+        console.log(data)
 
         if (data.status === "failed") {
             throw new Error(`Task failed: ${data.error || 'Unknown error occurs.'}`);
