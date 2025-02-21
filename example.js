@@ -76,7 +76,7 @@ try {
       console.log(
         await instance.Solve({
           type: "CloudflareChallenge",
-          url: "https://vip.charontv.com/challenge?id=5fd1d317401453312092009644",
+          url: "https://vip.charontv.com/challenge?id=123456",
           proxy: { scheme: "http", host: "127.0.0.1", port: 1080 },
           content: true,
         })
