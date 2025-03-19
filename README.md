@@ -28,7 +28,7 @@ Once Node.js is installed, follow these steps to set up CloudFreed:
    npm install
    ```
 
-### Docker Installation (Alternative)
+### Docker Installation
 
 If you prefer using Docker, you can run CloudFreed as a Docker container:
 
@@ -39,6 +39,8 @@ docker run -itd --name cloudfreed -p 3000:3000 \
   -e TIMEOUT=60 \
   sanling000/cloudfreed
 ```
+
+> Note: The Dockerfile for this project was created by [gua12345](https://github.com/gua12345)
 
 Configuration options:
 - `CLIENT_KEY`: Your API client key (required)

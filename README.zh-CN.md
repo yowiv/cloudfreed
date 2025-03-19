@@ -30,7 +30,7 @@ CloudFreed 是一个强大的工具，旨在绕过 Cloudflare 反机器人保护
 
 ### Docker 安装
 
-如果您更喜欢使用 Docker，您可以将 CloudFreed 作为 Docker 容器运行：
+如果您更喜欢使用 Docker，可以将 CloudFreed 作为 Docker 容器运行：
 
 ```bash
 docker run -itd --name cloudfreed -p 3000:3000 \
@@ -39,6 +39,8 @@ docker run -itd --name cloudfreed -p 3000:3000 \
   -e TIMEOUT=60 \
   sanling000/cloudfreed
 ```
+
+> 注意：本项目的 Dockerfile 由 [gua12345](https://github.com/gua12345) 创建
 
 配置选项：
 - `CLIENT_KEY`：您的 API 客户端密钥（必填）
