@@ -101,14 +101,6 @@ POST http://localhost:3000/createTask
 }
 ```
 
-Response Example:
-
-```
-{
-    "taskId": "m7dobozwh6gucqy29dk"
-}
-```
-
 Turnstile Challenge Example (proxy is optional for this type):
 
 ```
