@@ -45,7 +45,7 @@ try {
       console.log(
         await instance.Solve({
           type: "CloudflareChallenge",
-          url: "www.subber.xyz",
+          url: "grok.com",
           // proxy: { scheme: "socks5", host: "127.0.0.1", port: 1080 },
         })
       );

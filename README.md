@@ -3,6 +3,8 @@
   <h1>CloudFreed V4</h1>
 </div>
 
+[English](README.md) | [中文](README.zh-CN.md)
+
 CloudFreed is a powerful tool designed to bypass Cloudflare anti-bot protection, allowing users to access websites without being restricted by captchas or Cloudflare's security measures.
 
 ## Installation
@@ -25,6 +27,24 @@ Once Node.js is installed, follow these steps to set up CloudFreed:
    ```
    npm install
    ```
+
+### Docker Installation (Alternative)
+
+If you prefer using Docker, you can run CloudFreed as a Docker container:
+
+```bash
+docker run -itd --name cloudfreed -p 3000:3000 \
+  -e CLIENT_KEY=YOUR_CLIENT_KEY \
+  -e MAX_TASKS=1 \
+  -e TIMEOUT=60 \
+  sanling000/cloudfreed
+```
+
+Configuration options:
+- `CLIENT_KEY`: Your API client key (required)
+- `MAX_TASKS`: Maximum concurrent tasks (default: 1)
+- `TIMEOUT`: Timeout per task in seconds (default: 60)
+- Port 3000 is exposed for API access
 
 ## Usage
 
@@ -78,6 +98,28 @@ POST http://localhost:3000/createTask
     "host": "127.0.0.1",
     "port": 1080
   }
+}
+```
+
+Response Example:
+
+```
+{
+    "taskId": "m7dobozwh6gucqy29dk"
+}
+```
+
+Turnstile Challenge Example (proxy is optional for this type):
+
+```
+POST http://localhost:3000/createTask
+
+{
+  "clientKey": "YOUR_CLIENT_KEY",
+  "type": "Turnstile",
+  "url": "www.example.com",
+  "sitekey": "YOUR_SITE_KEY",
+  "userAgent": "YOUR_USER_AGENT"
 }
 ```
 
