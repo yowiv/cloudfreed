@@ -101,14 +101,6 @@ POST http://localhost:3000/createTask
 }
 ```
 
-响应示例：
-
-```
-{
-    "taskId": "m7dobozwh6gucqy29dk"
-}
-```
-
 Turnstile 挑战示例（此类型代理是可选的）：
 
 ```
